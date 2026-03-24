@@ -1,7 +1,6 @@
 ---
 name: scrollclaw-assemble
 description: "Stitch clips, unify voice with ElevenLabs S2S, apply post-production realism stack, and burn captions. The final assembly pipeline."
-Use `scripts/post-production.sh` for automated color grade, grain, and frame rate normalization.
 metadata:
   openclaw:
     emoji: "🔧"
@@ -14,13 +13,11 @@ metadata:
       - "ugc captions"
       - "ugc audio"
       - "ugc post-production"
-Use `scripts/post-production.sh` for automated color grade, grain, and frame rate normalization.
 ---
 
 # Assemble
 
 Three stages: stitch + audio → post-production → captions. Order matters.
-Use `scripts/post-production.sh` for automated color grade, grain, and frame rate normalization.
 
 ## Prerequisites
 
@@ -66,10 +63,10 @@ Use `scripts/stitch-video.sh` for resolution normalization. Read `references/voi
 ## Stage 2: Post-Production (mandatory)
 
 Raw AI output → post-production → final asset. Never skip.
+
 Use `scripts/post-production.sh` for automated color grade, grain, and frame rate normalization.
 
 Read `references/post-production.md` for the full realism stack: color grade, grain (the 4K upscale trick), skin texture, frame rate lock, audio realism, lighting consistency.
-Use `scripts/post-production.sh` for automated color grade, grain, and frame rate normalization.
 
 If mixing Sora + Kling clips, pay special attention to cross-engine color matching — see `references/orchestrator.md` (in `b-roll/references/`).
 
@@ -80,7 +77,6 @@ Read `references/green-zone.md` for platform safe zones.
 ## Stage 3: Captions (ALWAYS LAST)
 
 **⚠️ Captions MUST be applied AFTER post-production, not before.** Grain and color grade degrade clean caption pills.
-Use `scripts/post-production.sh` for automated color grade, grain, and frame rate normalization.
 
 ```bash
 # Auto-detect video resolution and generate matching caption overlay
@@ -103,11 +99,38 @@ Resolution note: Sora outputs 720x1280, Kling outputs 1076x1924. Always normaliz
 
 Requires `/usr/bin/ffmpeg` (apt version with libfreetype) and `/usr/bin/python3` with PIL.
 
+## Brand Memory Integration
+
+### Reads
+| File | Purpose |
+|------|---------|
+| `workspace/campaigns/<slug>/clips/*.mp4` | All A-roll and B-roll clips to assemble |
+| `workspace/campaigns/<slug>/scripts/<format>-script.md` | Timing, B-roll insertion points, caption text |
+| `workspace/campaigns/<slug>/creators/creator-<name>.md` | Voice reference for ElevenLabs S2S voice design |
+| `workspace/creators/creator-<name>.md` | Fallback if no campaign-specific profile exists |
+
+### Writes
+| File | Notes |
+|------|-------|
+| `workspace/campaigns/<slug>/clips/final-<version>.mp4` | Assembled video with voice, post-production, captions |
+| `workspace/campaigns/<slug>/output-log.md` | Assembly params, S2S voice used, ffmpeg settings (append-only) |
+
+### Context loading
+
+```
+🔧 Assemble context loaded:
+  ✓ Campaign: ridge-q1
+  ✓ A-roll clips: 3 (workspace/campaigns/ridge-q1/clips/a-roll-*.mp4)
+  ✓ B-roll clips: 2 (workspace/campaigns/ridge-q1/clips/b-roll-*.mp4)
+  ✓ Script: talking-head (workspace/campaigns/ridge-q1/scripts/talking-head-script.md)
+  ✓ Creator voice profile: Maya
+```
+
 ## Output
 
-- Final assembled video (MP4) with unified voice, post-production, and captions
-Use `scripts/post-production.sh` for automated color grade, grain, and frame rate normalization.
-- All intermediate files preserved in `campaigns/<slug>/`
+- Final assembled video (MP4) in `workspace/campaigns/<slug>/clips/final-<version>.mp4`
+- All intermediate files preserved in `workspace/campaigns/<slug>/`
+- Assembly params logged to `workspace/campaigns/<slug>/output-log.md`
 
 ## Next Step
 

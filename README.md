@@ -107,31 +107,80 @@ bash scripts/check-deps.sh
 
 ```
 scrollclaw/
-├── SKILL.md              Core doctrine + 14-step workflow
-├── README.md             You are here
-├── references/           15 reference docs (loaded on demand)
-│   ├── persona-research.md
-│   ├── script-voice.md
-│   ├── format-library.md
-│   ├── hook-emotions.md
-│   ├── green-zone.md
-│   ├── first-frame-prompting.md
-│   ├── first-frame-psychology.md
-│   ├── color-reference-system.md
-│   ├── motion-prompting.md
-│   ├── orchestrator.md
-│   ├── audio-orchestration.md
-│   ├── voice-system.md
-│   ├── post-production.md
-│   ├── virality-scoring.md
-│   └── sora-api.md
-├── scripts/              10 automation scripts
-├── evals/                Trigger + execution benchmarks
-└── assets/               Campaign brief template
+├── SKILL.md                    Router — orchestrates the full suite
+├── README.md                   You are here
+├── _system/                    Shared doctrine + context protocol
+│   ├── SKILL.md                Core doctrine, format selection, pipeline routing
+│   └── references/
+│       ├── brand-campaign-context.md   Brand memory + campaign workspace protocol
+│       ├── color-reference-system.md
+│       ├── creator-system.md
+│       ├── format-library.md
+│       └── hook-emotions.md
+├── persona/                    Step 1: Persona research + scripting
+│   ├── SKILL.md
+│   └── references/
+│       ├── persona-research.md
+│       └── script-voice.md
+├── first-frame/                Step 2: Canonical frame generation
+│   ├── SKILL.md
+│   └── references/
+│       ├── first-frame-prompting.md
+│       └── first-frame-psychology.md
+├── animate/                    Step 3: A-roll (Sora 2)
+│   ├── SKILL.md
+│   └── references/
+│       ├── motion-prompting.md
+│       └── sora-api.md
+├── b-roll/                     Step 4: B-roll (Kling 3)
+│   ├── SKILL.md
+│   └── references/
+│       ├── kling-api.md
+│       └── orchestrator.md
+├── assemble/                   Step 5: Stitch + audio + post-production + captions
+│   ├── SKILL.md
+│   └── references/
+│       ├── audio-orchestration.md
+│       ├── green-zone.md
+│       ├── orchestrator.md
+│       ├── post-production.md
+│       └── voice-system.md
+├── score/                      Step 6: Virality scoring gate
+│   ├── SKILL.md
+│   └── references/
+│       └── virality-scoring.md
+├── scripts/                    10 automation scripts
+├── evals/                      Trigger + execution benchmarks
+└── assets/                     Campaign brief template
 ```
+
+## Brand & Campaign Context
+
+ScrollClaw persists work across sessions so campaign 10 takes a fraction of campaign 1.
+
+```
+workspace/
+├── brand/                      ← Read-only for ScrollClaw (GrowthClaw or manual)
+│   ├── voice-profile.md        ← Informs script tone
+│   ├── positioning.md          ← Informs persona research direction
+│   └── audience.md             ← Anchors creator archetype selection
+├── creators/                   ← Global creator profiles (reuse across campaigns)
+└── campaigns/<slug>/
+    ├── brief.md                ← Campaign brief
+    ├── persona-research.md     ← Extracted customer language
+    ├── creators/               ← Campaign-specific creator overrides
+    ├── scripts/                ← Approved scripts
+    ├── frames/                 ← First frames + context frames
+    ├── clips/                  ← A-roll, B-roll, assembled finals
+    ├── scores/                 ← Virality score cards
+    ├── output-log.md           ← All prompt params (append-only)
+    └── learnings.md            ← What worked, what didn't (append-only)
+```
+
+Full context protocol: [`_system/references/brand-campaign-context.md`](_system/references/brand-campaign-context.md)
 
 ---
 
 Built by [Matt Berman](https://x.com/TheMattBerman) · [Emerald Digital](https://emeralddigital.dev) · [Big Players Newsletter](https://bigplayers.beehiiv.com)
 
-Full documentation: [SKILL.md](SKILL.md)
+Full documentation: [_system/SKILL.md](_system/SKILL.md)

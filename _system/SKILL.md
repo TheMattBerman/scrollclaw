@@ -91,5 +91,55 @@ Read `references/format-library.md` for shot-by-shot blueprints. Read `reference
 
 **Env:** FAL_KEY (primary), REPLICATE_API_TOKEN (Nano Banana + fallback), ELEVENLABS_API_KEY (multi-clip voice), OPENROUTER_API_KEY (Gemini virality scoring).
 
+## Brand & Campaign Context
+
+ScrollClaw persists work across sessions using a structured workspace. Campaign 10 takes a fraction of campaign 1 because creator profiles, brand context, and learnings accumulate.
+
+**Full protocol:** Read `references/brand-campaign-context.md`.
+
+### Workspace structure
+
+```
+workspace/
+├── brand/                    ← Read-only for ScrollClaw (written by GrowthClaw etc.)
+│   ├── voice-profile.md      ← Brand voice → informs script tone
+│   ├── positioning.md        ← Differentiation → informs persona research
+│   └── audience.md           ← ICP → informs creator archetype selection
+├── creators/                 ← Global creator profiles (reusable across campaigns)
+└── campaigns/<slug>/
+    ├── brief.md              ← Campaign brief (from assets/campaign-brief-template.md)
+    ├── persona-research.md   ← Written by /persona
+    ├── creators/             ← Campaign-specific creator overrides
+    ├── scripts/              ← Approved scripts
+    ├── frames/               ← First frames + context frames
+    ├── clips/                ← A-roll, B-roll, assembled finals
+    ├── scores/               ← Virality score cards
+    ├── output-log.md         ← Prompt log, generation params (append-only)
+    └── learnings.md          ← What worked, what didn't (append-only)
+```
+
+### Context matrix
+
+| Skill | Reads | Writes |
+|-------|-------|--------|
+| `/persona` | `brand/{voice-profile,positioning,audience}.md`, campaign brief | `persona-research.md`, `creators/`, `scripts/` |
+| `/first-frame` | `creators/`, `scripts/`, campaign brief | `frames/`, `output-log.md` |
+| `/animate` | `frames/`, `scripts/`, `creators/` | `clips/a-roll-*.mp4`, `output-log.md` |
+| `/b-roll` | `frames/`, `clips/a-roll-*`, `scripts/` | `clips/b-roll-*.mp4`, `output-log.md` |
+| `/assemble` | `clips/*`, `scripts/`, `creators/` | `clips/final-*.mp4`, `output-log.md` |
+| `/score` | `clips/final-*`, campaign brief, `persona-research.md` | `scores/`, `learnings.md` |
+
+### Rules for reading brand memory
+
+- Check if each brand file exists before reading. Never error on missing files.
+- Show what was loaded: `✓ Loaded brand voice: conversational-direct` / `✗ No audience file — proceeding standalone`
+- ScrollClaw reads `workspace/brand/` but **never writes** there
+
+### Rules for writing campaign files
+
+- `output-log.md` and `learnings.md` are **append-only** — never overwrite
+- Creator profiles: global ones go in `workspace/creators/`, campaign overrides in `campaigns/<slug>/creators/`
+- Skills own their outputs. `/persona` owns `persona-research.md`. `/score` owns `scores/` and `learnings.md`.
+
 ## Setup
 Run `scripts/check-deps.sh` to verify all API keys and dependencies.

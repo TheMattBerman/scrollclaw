@@ -50,10 +50,57 @@ Score every video before publishing. Read `references/virality-scoring.md` for t
    - Text readability weak → `/assemble` (fix captions)
    - Audio/voice issues → `/assemble` (re-run S2S)
 
+## Brand Memory Integration
+
+### Reads
+| File | Purpose |
+|------|---------|
+| `workspace/campaigns/<slug>/clips/final-*.mp4` | Video(s) to score |
+| `workspace/campaigns/<slug>/brief.md` | Original campaign goals — score against intent, not just virality |
+| `workspace/campaigns/<slug>/persona-research.md` | Whether the script language matches real customer language |
+
+### Writes
+| File | Notes |
+|------|-------|
+| `workspace/campaigns/<slug>/scores/score-<version>.md` | Score card with per-dimension breakdown and go/no-go |
+| `workspace/campaigns/<slug>/learnings.md` | Append-only — what worked, what didn't, threshold notes |
+
+### Context loading
+
+```
+📊 Score context loaded:
+  ✓ Campaign: ridge-q1
+  ✓ Final clips: 2 (workspace/campaigns/ridge-q1/clips/final-*.mp4)
+  ✓ Brief: workspace/campaigns/ridge-q1/brief.md
+  ✓ Persona research: workspace/campaigns/ridge-q1/persona-research.md
+```
+
+### Learnings append format
+
+After every score, append to `workspace/campaigns/<slug>/learnings.md`:
+
+```markdown
+## YYYY-MM-DD — <campaign-slug> <format>
+
+**Score:** <average>/100 (<go/no-go>)
+**Dimension breakdown:** Hook <n> | Emotional <n> | Pacing <n> | Captions <n> | Scroll-stop <n> | Completion <n> | Share <n>
+
+**What worked:**
+- [specific finding]
+
+**What didn't:**
+- [specific finding]
+
+**Remediation:** [if no-go: which skill to route back to and why]
+```
+
+Never overwrite this file. Only append.
+
 ## Output
 
-- Virality score card with per-dimension scores
+- Virality score card in `workspace/campaigns/<slug>/scores/score-<version>.md`
 - Go/no-go decision
+- Learnings appended to `workspace/campaigns/<slug>/learnings.md`
 - If no-go: specific remediation routing
 
 ## Batch Scoring

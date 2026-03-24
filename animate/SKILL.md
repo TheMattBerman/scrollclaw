@@ -81,10 +81,37 @@ Sora's content filter runs AFTER generation — can fail at 99%. If blocked:
 - Keep Subject descriptions generic — the first frame already defines appearance
 - fal.ai is primary provider; Replicate is backup
 
+## Brand Memory Integration
+
+### Reads
+| File | Purpose |
+|------|---------|
+| `workspace/campaigns/<slug>/frames/frame1.png` | Canonical face — fed to Sora i2v to lock creator identity |
+| `workspace/campaigns/<slug>/scripts/<format>-script.md` | A-roll segments, dialogue, shot timing |
+| `workspace/campaigns/<slug>/creators/creator-<name>.md` | Creator energy/vibe reference for motion prompting |
+| `workspace/creators/creator-<name>.md` | Fallback if no campaign-specific profile exists |
+
+### Writes
+| File | Notes |
+|------|-------|
+| `workspace/campaigns/<slug>/clips/a-roll-01.mp4` | One file per A-roll segment |
+| `workspace/campaigns/<slug>/output-log.md` | Motion prompt, model, duration, provider (append-only) |
+
+### Context loading
+
+```
+🎥 Animate context loaded:
+  ✓ First frame: workspace/campaigns/ridge-q1/frames/frame1.png
+  ✓ Script: talking-head (A-roll segments: 3)
+  ✓ Creator: Maya
+  ✓ Campaign: ridge-q1
+```
+
 ## Output
 
-- A-roll clips (MP4) in `campaigns/<slug>/clips/`
-- Each clip corresponds to an `[A-ROLL]` script segment
+- A-roll clips (MP4) in `workspace/campaigns/<slug>/clips/`
+- Each clip named `a-roll-<segment>.mp4` corresponding to an `[A-ROLL]` script segment
+- Generation params logged to `workspace/campaigns/<slug>/output-log.md`
 
 ## Next Step
 

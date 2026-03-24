@@ -71,11 +71,37 @@ Iterate on frame 1 more than anything else. Expect 2-4 attempts before it passes
 
 Once frame 1 is locked, the rest chain from it.
 
+## Brand Memory Integration
+
+### Reads
+| File | Purpose |
+|------|---------|
+| `workspace/campaigns/<slug>/creators/creator-<name>.md` | Creator identity — face, hair, build, wardrobe, energy |
+| `workspace/creators/creator-<name>.md` | Global creator profile (fallback if no campaign override exists) |
+| `workspace/campaigns/<slug>/scripts/<format>-script.md` | Which scene/setting the first frame needs to establish |
+| `workspace/campaigns/<slug>/brief.md` | Brand context, color cues, environment direction |
+
+### Writes
+| File | Notes |
+|------|-------|
+| `workspace/campaigns/<slug>/frames/frame1.png` | Canonical face — referenced by all subsequent frames and animation |
+| `workspace/campaigns/<slug>/frames/environment-frame.png` | Context-specific frames for multi-setting formats |
+| `workspace/campaigns/<slug>/output-log.md` | Prompt params, model version, generation time (append-only) |
+
+### Context loading
+
+```
+🖼️ First Frame context loaded:
+  ✓ Creator: Maya (workspace/campaigns/ridge-q1/creators/creator-maya.md)
+  ✓ Script: talking-head (workspace/campaigns/ridge-q1/scripts/talking-head-script.md)
+  ✓ Campaign: ridge-q1
+```
+
 ## Output
 
-- Canonical first frame image (PNG) in `campaigns/<slug>/frames/`
-- Context-specific frames for multi-setting formats
-- Prompt file and output log saved
+- Canonical first frame image (PNG) in `workspace/campaigns/<slug>/frames/`
+- Context-specific frames for multi-setting formats in `workspace/campaigns/<slug>/frames/`
+- Prompt params logged to `workspace/campaigns/<slug>/output-log.md`
 
 ## Next Step
 
