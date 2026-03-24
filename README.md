@@ -103,6 +103,12 @@ bash scripts/check-deps.sh
 - **~1 in 3 Sora generations have hand artifacts.** Reroll, don't fix the prompt.
 - **Multi-frame formats: chain from frame 1.** Generate the canonical face first, then reference it for every subsequent frame. Parallel generation causes face drift.
 
+## Evaluation
+
+- Baseline comparison: [`evals/baseline-vs-scrollclaw.md`](evals/baseline-vs-scrollclaw.md)
+- Execution checks: [`evals/execution-evals.md`](evals/execution-evals.md)
+- Trigger checks: [`evals/trigger-evals.md`](evals/trigger-evals.md)
+
 ## Architecture
 
 ```
@@ -116,7 +122,8 @@ scrollclaw/
 │       ├── color-reference-system.md
 │       ├── creator-system.md
 │       ├── format-library.md
-│       └── hook-emotions.md
+│       ├── hook-emotions.md
+│       └── taste-calibration.md
 ├── persona/                    Step 1: Persona research + scripting
 │   ├── SKILL.md
 │   └── references/
@@ -137,7 +144,7 @@ scrollclaw/
 │   └── references/
 │       ├── kling-api.md
 │       └── orchestrator.md
-├── assemble/                   Step 5: Stitch + audio + post-production + captions
+├── assemble/                   Step 5: Stitch, post, captions, or full-assemble
 │   ├── SKILL.md
 │   └── references/
 │       ├── audio-orchestration.md
@@ -150,7 +157,7 @@ scrollclaw/
 │   └── references/
 │       └── virality-scoring.md
 ├── scripts/                    10 automation scripts
-├── evals/                      Trigger + execution benchmarks
+├── evals/                      Baseline, trigger, and execution benchmarks
 └── assets/                     Campaign brief template
 ```
 

@@ -96,6 +96,25 @@ After every score, append to `workspace/campaigns/<slug>/learnings.md`:
 
 Never overwrite this file. Only append.
 
+## Contract
+
+### Input
+- Required: at least one final assembled clip
+- Optional: campaign brief, persona research, prior campaign learnings
+- Format: workspace video files plus markdown context
+- Source: `/assemble`, `workspace/campaigns/<slug>/brief.md`, and `persona-research.md`
+
+### Output
+- Produces: one score card per clip, a go/no-go decision, and appended learnings
+- Format: markdown files in `workspace/campaigns/<slug>/scores/` plus append-only entries in `learnings.md`
+- Default behavior: score every final clip against the 7 dimensions and route the user back to the failing stage if the score is below 70
+- Downstream use: publish/no-publish decision and future campaign learnings
+
+### Validation
+- Pre-conditions: final clip exists and is watchable end to end
+- Post-conditions: score includes a dimension breakdown, a threshold decision, and clear remediation if needed
+- Failure checks: do not recommend publishing without a real breakdown; if the clip is unscorable or missing context, flag the gap explicitly
+
 ## Output
 
 - Virality score card in `workspace/campaigns/<slug>/scores/score-<version>.md`
@@ -109,8 +128,8 @@ For campaign batches, score all variants and rank. Publish only the 70+ tier. Be
 
 ```bash
 bash scripts/batch-campaign.sh \
-  --workspace campaigns/<slug> \
-  --creators creators/ \
+  --workspace workspace/campaigns/<slug> \
+  --creators workspace/campaigns/<slug>/creators/ \
   --formats "talking-head,pov-demo,podcast-clip" \
   --dual-output
 ```

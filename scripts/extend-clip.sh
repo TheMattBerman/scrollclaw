@@ -6,9 +6,9 @@ set -euo pipefail
 #
 # Usage:
 #   bash extend-clip.sh \
-#     --input clip-01.mp4 \
+#     --input a-roll-01.mp4 \
 #     --prompt-file extension-prompt.txt \
-#     --output clip-01-extended.mp4 \
+#     --output a-roll-01-extended.mp4 \
 #     --seconds 10 \
 #     --character-id char_123
 

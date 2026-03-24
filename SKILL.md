@@ -1,6 +1,6 @@
 ---
 name: scrollclaw
-description: "AI UGC video production suite. Six sub-skills that take a brand from persona research through virality-scored video. Produces talking head, podcast clip, hook face + demo, wall of text, visual transformation, and hybrid transformation formats."
+description: "Router and orchestrator for AI UGC video production. Use for broad outcome requests like making a UGC video or running a campaign; it routes step-specific requests to the right sub-skill and can drive the full pipeline from persona research through virality-scored video."
 metadata:
   openclaw:
     emoji: "🎬"
@@ -57,7 +57,30 @@ When the user invokes ScrollClaw or asks about UGC video, route to the right sub
 | "Score this video" / "Is this ready to publish?" | `/score` |
 | "Run the full pipeline" | Start at `/persona`, proceed sequentially |
 
+Broad outcome requests stay at the root. Start the pipeline instead of asking the user to pick a sub-skill.
+
+Stage-specific requests bypass the root and go straight to that sub-skill.
+
 If the user isn't sure where they are, ask: **"Where are you in the pipeline?"** and show them the 6 steps above.
+
+## Contract
+
+### Input
+- Required: brand/product context plus a campaign goal, or an existing campaign workspace if resuming
+- Optional: format preference, creator profile, screen recordings/screenshots, existing clips, campaign slug
+- Format: raw text, URL, file paths, or `workspace/campaigns/<slug>/` files
+- Source: user prompt, campaign brief, and upstream `workspace/brand/` files
+
+### Output
+- Produces: either a route decision to the correct stage or a sequential full-pipeline run starting at `/persona`
+- Format: inline orchestration plus saved workspace artifacts produced by sub-skills
+- Default behavior: broad requests like "make me a UGC video" or "start a campaign" start at `/persona` and continue stage by stage until blocked by missing inputs, an approval gate, or a dependency failure
+- Downstream use: `/persona`, `/first-frame`, `/animate`, `/b-roll`, `/assemble`, and `/score`
+
+### Validation
+- Pre-conditions: workspace exists or can be initialized before generation steps begin
+- Post-conditions: the user knows the current stage, the next stage, and which workspace artifacts were produced
+- Failure checks: do not leave the user at a vague route; if blocked, name the exact missing file, asset, or approval needed
 
 ---
 

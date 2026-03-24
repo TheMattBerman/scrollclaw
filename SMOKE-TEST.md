@@ -1,7 +1,9 @@
-# SMOKE TEST REPORT — sora-ugc Scripts
+# SMOKE TEST REPORT — ScrollClaw Scripts
 **Date:** 2026-03-23  
 **Tester:** Jean Luc (subagent)  
 **Environment:** WSL2 / Ubuntu, ffmpeg 8.0.1, fal.ai & Replicate keys loaded
+
+See also: [`evals/baseline-vs-scrollclaw.md`](evals/baseline-vs-scrollclaw.md) for the behavior-shift eval against a generic assistant.
 
 ---
 

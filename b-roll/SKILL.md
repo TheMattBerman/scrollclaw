@@ -43,16 +43,20 @@ Example: If Sarah says "she finishes the whole bowl" → cut to dog finishing th
 # B-roll with environment-matched start frame (RECOMMENDED)
 bash scripts/generate-broll.sh \
   --provider fal \
-  --image campaigns/<slug>/frames/environment-frame.png \
-  --prompt-file campaigns/<slug>/broll-prompt.txt \
-  --output campaigns/<slug>/clips/broll-01.mp4 \
+  --image workspace/campaigns/<slug>/frames/environment-frame.png \
+  --prompt-file workspace/campaigns/<slug>/broll-prompt.txt \
+  --output workspace/campaigns/<slug>/clips/b-roll-01.mp4 \
+  --log-file workspace/campaigns/<slug>/output-log.md \
+  --label b-roll-01 \
   --seconds 5
 
 # Faceless B-roll (no start frame needed)
 bash scripts/generate-broll.sh \
   --provider fal \
-  --prompt-file campaigns/<slug>/broll-prompt.txt \
-  --output campaigns/<slug>/clips/broll-02.mp4 \
+  --prompt-file workspace/campaigns/<slug>/broll-prompt.txt \
+  --output workspace/campaigns/<slug>/clips/b-roll-02.mp4 \
+  --log-file workspace/campaigns/<slug>/output-log.md \
+  --label b-roll-02 \
   --seconds 5
 ```
 
@@ -91,6 +95,25 @@ Read `references/kling-api.md` for Kling 3 endpoint details, field names, and qu
   ✓ Script: talking-head (B-roll segments: 2)
   ✓ Campaign: ridge-q1
 ```
+
+## Contract
+
+### Input
+- Required: `[B-ROLL]` script segments plus either an environment frame or usable A-roll clips for extraction
+- Optional: product screenshots, faceless B-roll prompts, campaign brief for scene grounding
+- Format: workspace image/video files plus B-roll prompt text
+- Source: `/animate`, `/persona`, and `references/orchestrator.md`
+
+### Output
+- Produces: one visual-only B-roll clip per segment plus append-only generation logs
+- Format: MP4 files in `workspace/campaigns/<slug>/clips/` and rows in `output-log.md`
+- Default behavior: use Kling with an environment-matched start frame; for app demos, use real screenshots or recordings instead of AI UI generation
+- Downstream use: `/assemble`
+
+### Validation
+- Pre-conditions: the cut point is clear in the script and there is enough scene context to match the A-roll environment
+- Post-conditions: clip visually fits the voice beat, feels like the same world as the A-roll, and saves locally
+- Failure checks: do not accept stock-looking B-roll, mismatched rooms, or fake app UI when the product needs a real screen
 
 ## Output
 

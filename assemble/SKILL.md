@@ -1,15 +1,19 @@
 ---
 name: scrollclaw-assemble
-description: "Stitch clips, unify voice with ElevenLabs S2S, apply post-production realism stack, and burn captions. The final assembly pipeline."
+description: "Assembly stage for UGC videos. Handles stitch mode, post mode, captions mode, or full-assemble mode when the user is explicitly working on finalizing an existing campaign video."
 metadata:
   openclaw:
     emoji: "🔧"
     user-invocable: true
     triggers:
       - "assemble video"
+      - "full assemble"
       - "stitch clips"
       - "post production"
+      - "post produce video"
       - "add captions"
+      - "burn captions"
+      - "caption overlay"
       - "ugc captions"
       - "ugc audio"
       - "ugc post-production"
@@ -18,6 +22,17 @@ metadata:
 # Assemble
 
 Three stages: stitch + audio → post-production → captions. Order matters.
+
+## Modes
+
+This skill handles four intents. Choose the narrowest one that matches the user's request:
+
+- `stitch` — timeline assembly and voice orchestration only
+- `post` — post-production realism pass only
+- `captions` — caption rendering and overlay only
+- `full-assemble` — do all three in order; this is the default when the user says "assemble", "finish the video", or otherwise asks for the final output
+
+If the user asks for one stage explicitly, do not force the full pipeline. If they ask for the final video, run `full-assemble`.
 
 ## Prerequisites
 
@@ -52,9 +67,11 @@ For longer UGC, either use fal.ai's 20s duration or stitch clips:
 
 ```bash
 bash scripts/extend-clip.sh \
-  --input campaigns/<slug>/clips/clip-01.mp4 \
-  --prompt-file campaigns/<slug>/extension-prompt.txt \
-  --output campaigns/<slug>/clips/clip-01-extended.mp4 \
+  --input workspace/campaigns/<slug>/clips/a-roll-01.mp4 \
+  --prompt-file workspace/campaigns/<slug>/extension-prompt.txt \
+  --output workspace/campaigns/<slug>/clips/a-roll-01-extended.mp4 \
+  --log-file workspace/campaigns/<slug>/output-log.md \
+  --label a-roll-01-extended \
   --seconds 10
 ```
 
@@ -81,14 +98,14 @@ Read `references/green-zone.md` for platform safe zones.
 ```bash
 # Auto-detect video resolution and generate matching caption overlay
 /usr/bin/python3 scripts/generate-caption.py \
-  --video clips/post-produced.mp4 \
+  --video workspace/campaigns/<slug>/clips/post-produced.mp4 \
   --lines "when your gym software,cannot even handle,a data migration..." \
-  --output frames/caption.png
+  --output workspace/campaigns/<slug>/frames/caption.png
 
 # Overlay onto post-produced video
-/usr/bin/ffmpeg -i clips/post-produced.mp4 -i frames/caption.png \
+/usr/bin/ffmpeg -i workspace/campaigns/<slug>/clips/post-produced.mp4 -i workspace/campaigns/<slug>/frames/caption.png \
   -filter_complex "[0:v][1:v]overlay=0:0:enable='between(t,0.2,3.8)'" \
-  -c:v libx264 -preset fast -crf 18 -c:a copy clips/final.mp4
+  -c:v libx264 -preset fast -crf 18 -c:a copy workspace/campaigns/<slug>/clips/final-01.mp4
 ```
 
 **Critical:** caption PNG must match EXACT video resolution. Use `--video` flag to auto-detect. Mismatched resolutions cause off-center captions.
@@ -125,6 +142,30 @@ Requires `/usr/bin/ffmpeg` (apt version with libfreetype) and `/usr/bin/python3`
   ✓ Script: talking-head (workspace/campaigns/ridge-q1/scripts/talking-head-script.md)
   ✓ Creator voice profile: Maya
 ```
+
+## Contract
+
+### Input
+- Required: A-roll clips plus a timing-aware script
+- Optional: B-roll clips, creator voice profile, ElevenLabs S2S settings
+- Format: workspace video files, script markdown, and optional voice metadata
+- Source: `/animate`, `/b-roll`, `/persona`, and `references/audio-orchestration.md`
+
+### Output
+- Produces: one assembled final video with stitched visuals, audio, post-production, and captions
+- Format: `final-<version>.mp4` in `workspace/campaigns/<slug>/clips/` plus append-only assembly logs
+- Default behavior: stitch A-roll first, apply voice orchestration, insert B-roll as visual-only cuts, run post-production, then add captions last
+- Downstream use: `/score`
+
+### Validation
+- Pre-conditions: source clips exist, script timing is usable, and all inputs are normalized enough to assemble
+- Post-conditions: final video is saved locally, voice stays continuous, and captions sit on the post-produced file rather than the raw render
+- Failure checks: fix resolution mismatches, broken timing, or synthetic-looking audio here before handing anything to `/score`
+
+### Stage checkpoints
+- `stitch`: assembled timeline exists, cuts land on script beats, voice continuity holds across A-roll and B-roll
+- `post`: post-produced file exists, mixed-engine clips look visually coherent, phone test does not immediately ping as AI
+- `captions`: caption overlay matches exact video resolution, readability is mobile-safe, and captions were applied after post-production
 
 ## Output
 

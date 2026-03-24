@@ -22,7 +22,7 @@ Frame 1 is a visual design problem, not a copywriting problem. Read `references/
 ## Prerequisites
 
 - Script approved (from `/persona`)
-- Creator profile exists in `creators/`
+- Creator profile exists in `workspace/campaigns/<slug>/creators/` or `workspace/creators/`
 - Brand context loaded
 
 ## Prompt Structure (Three Layers)
@@ -39,10 +39,10 @@ Include "no text, no words, no letters, no writing" in negative prompt to preven
 
 ```bash
 python3 scripts/generate-first-frame.py \
-  --prompt-file campaigns/<slug>/frame1-prompt.txt \
-  --output-file campaigns/<slug>/frames/frame1.png \
-  --creator creators/creator-<name>.md \
-  --log-file campaigns/<slug>/output-log.md \
+  --prompt-file workspace/campaigns/<slug>/frame1-prompt.txt \
+  --output-file workspace/campaigns/<slug>/frames/frame1.png \
+  --creator workspace/campaigns/<slug>/creators/creator-<name>.md \
+  --log-file workspace/campaigns/<slug>/output-log.md \
   --aspect-ratio "9:16"
 ```
 
@@ -96,6 +96,25 @@ Once frame 1 is locked, the rest chain from it.
   ✓ Script: talking-head (workspace/campaigns/ridge-q1/scripts/talking-head-script.md)
   ✓ Campaign: ridge-q1
 ```
+
+## Contract
+
+### Input
+- Required: approved script plus a creator profile
+- Optional: campaign brief, color reference inputs, global creator fallback profile
+- Format: workspace markdown files plus prompt text
+- Source: `/persona`, `workspace/campaigns/<slug>/brief.md`, and `_system/references/color-reference-system.md`
+
+### Output
+- Produces: one canonical face image and any context-specific environment frames needed for the format
+- Format: PNG files in `workspace/campaigns/<slug>/frames/` plus prompt log entries in `output-log.md`
+- Default behavior: generate `frame1.png` first, stop for review, then chain any additional frames from it
+- Downstream use: `/animate` and `/b-roll`
+
+### Validation
+- Pre-conditions: script is approved, creator profile exists, and the target setting is clear enough to visualize
+- Post-conditions: frame looks like a phone photo, preserves creator identity, and is strong enough to chain into later generations
+- Failure checks: reroll or revise if the image looks like an AI render, the identity drifts, or the scene lacks believable real-world clutter
 
 ## Output
 

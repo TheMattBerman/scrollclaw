@@ -1,23 +1,19 @@
 ---
 name: scrollclaw-persona
-description: "Persona research, brand context, creator profiles, and scriptwriting for UGC campaigns. The messaging foundation before any generation happens."
+description: "Start of the UGC pipeline for persona research, creator profiles, format selection, and scriptwriting. Use when the user is clearly asking for messaging work rather than broad full-pipeline orchestration."
 metadata:
   openclaw:
     emoji: "🎭"
     user-invocable: true
     triggers:
+      - "persona research"
       - "ugc persona"
       - "ugc script"
       - "ugc research"
+      - "write ugc script"
       - "creator profile"
-      - "ugc campaign"
-      - "ai ugc"
-      - "sora ugc"
-      - "create ugc"
-      - "talking head video"
-      - "product review video"
-      - "podcast clip"
-      - "wall of text"
+      - "format selection"
+      - "script rewrite"
 ---
 
 # Persona & Script
@@ -41,7 +37,7 @@ Load brand voice file if it exists. Know the product, the audience, the vibe.
 
 ## Step 3: Creator Profiles
 
-Each creator gets a profile in `creators/creator-<name>.md`. Read `references/script-voice.md` for voice calibration.
+Each creator gets a profile in `workspace/campaigns/<slug>/creators/creator-<name>.md` for campaign-specific work, or `workspace/creators/creator-<name>.md` for reusable global profiles. Read `references/script-voice.md` for voice calibration.
 
 ```bash
 bash scripts/create-creator.sh <workspace> <creator-name>
@@ -103,6 +99,25 @@ Mark the script with `[A-ROLL]` and `[B-ROLL]` tags. A-roll = Sora (talking head
 ```
 
 Handle missing files gracefully. Never error. Proceed standalone with a note.
+
+## Contract
+
+### Input
+- Required: campaign brief plus a clear product, audience, or offer to write from
+- Optional: `workspace/brand/{voice-profile,positioning,audience}.md`, existing creator profiles, format preference
+- Format: brief, raw brand notes, review mining inputs, and workspace markdown files
+- Source: user prompt, `workspace/campaigns/<slug>/brief.md`, and upstream brand memory files
+
+### Output
+- Produces: persona research, creator profile(s), and one approved script with `[A-ROLL]` and `[B-ROLL]` tags
+- Format: markdown files in `workspace/campaigns/<slug>/` plus inline script review for approval
+- Default behavior: do the research, choose the format, and present the script for approval before any visual generation
+- Downstream use: `/first-frame`, `/animate`, `/b-roll`, `/assemble`, `/score`
+
+### Validation
+- Pre-conditions: campaign brief exists and there is enough product context to identify a real customer problem
+- Post-conditions: script maps to the format blueprint, uses exact customer language, and has explicit visual beats
+- Failure checks: do not advance with generic copy, missing segment mapping, or an unapproved script unless the user explicitly says to skip approval
 
 ## Output
 
