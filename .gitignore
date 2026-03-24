@@ -1,0 +1,13 @@
+# Test outputs
+test-output/*.mp4
+*.mp4
+*.wav
+*.mp3
+
+# System
+.DS_Store
+__pycache__/
+*.pyc
+
+# Temp
+/tmp/

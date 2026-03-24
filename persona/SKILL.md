@@ -1,0 +1,86 @@
+---
+name: scrollclaw-persona
+description: "Persona research, brand context, creator profiles, and scriptwriting for UGC campaigns. The messaging foundation before any generation happens."
+metadata:
+  openclaw:
+    emoji: "🎭"
+    user-invocable: true
+    triggers:
+      - "ugc persona"
+      - "ugc script"
+      - "ugc research"
+      - "creator profile"
+      - "ugc campaign"
+      - "ai ugc"
+      - "sora ugc"
+      - "create ugc"
+      - "talking head video"
+      - "product review video"
+      - "podcast clip"
+      - "wall of text"
+---
+
+# Persona & Script
+
+Everything starts here. No first frames, no animation, no audio until the messaging is locked.
+
+## Step 1: Persona Research (do not skip)
+
+Read `references/persona-research.md`. Minimum 60 minutes mining competitor reviews on Amazon, Trustpilot, Reddit. Copy exact phrases — do not paraphrase.
+
+You're looking for exact language, not information:
+- "I was doing everything right and my body wasn't cooperating" → goes into a script
+- "I finally feel like myself again" → useless, discard
+- "I wore a dress I hadn't put on since my daughter was born and cried in the fitting room" → this is what you want
+
+Specific language produces viewers who can viscerally imagine the result. Generic language produces viewers who merely understand it's possible. The first converts. The second doesn't.
+
+## Step 2: Brand Context
+
+Load brand voice file if it exists. Know the product, the audience, the vibe.
+
+## Step 3: Creator Profiles
+
+Each creator gets a profile in `creators/creator-<name>.md`. Read `references/script-voice.md` for voice calibration.
+
+```bash
+bash scripts/create-creator.sh <workspace> <creator-name>
+```
+
+## Step 4: Format Selection
+
+Refer to the format table in the system context (loaded automatically). Ask the user what they're making and guide them.
+
+**For Hook Face + Demo:** always recommend real demo footage (screen recording) over AI-generated demo. The hook face stops the scroll — the demo should be the real product. Use `scripts/build-hook-demo.sh` to combine.
+
+## Step 5: Script
+
+Read `references/script-voice.md`. Use exact phrases from persona research. Test every line: if it sounds like a copywriter wrote it, rewrite until it sounds like someone talking to their phone.
+
+**FORMAT ENFORCEMENT (mandatory):** Before writing, pull the shot breakdown from `the format table in the system context (loaded automatically)` for the chosen format. The script MUST map to the shot breakdown:
+
+| Format | Script must have |
+|--------|-----------------|
+| Talking Head | Hook (0-4s) + Show (4-12s) + Verdict (12-20s). SHOW must include a visual action. |
+| Hook Face + Demo | Hook face with emotion + text (0-4s) + hard cut + Demo (4-14s). Hook has NO dialogue. |
+| Podcast Clip | Mid-conversation entry + The take + The beat. Must reference unseen host. |
+| Visual Transformation | Hook frame with concept name + Before + Turning point + After + Close |
+| Hybrid Transformation | Talking head before + Slideshow mechanism bridge + Talking head after |
+| Wall of Text | Dense text only — no voice, no video gen |
+
+**Validation:** After writing, map each line to a segment. If any segment is missing or the script is one continuous monologue with no visual structure — rewrite. A script without visual beats is not a script, it's a ramble.
+
+**Present the script to the user for approval** before generating anything. Include the segment mapping. User can override with "skip approval" for autonomous generation.
+
+Mark the script with `[A-ROLL]` and `[B-ROLL]` tags. A-roll = Sora (talking head + dialogue). B-roll = Kling (everything else). Voice runs continuously over B-roll.
+
+## Output
+
+- Persona research doc with extracted phrases
+- Creator profile(s) in `creators/`
+- Approved script with segment mapping and A/B-roll tags
+- Format selection locked
+
+## Next Step
+
+Script approved → run `/first-frame` to generate the canonical face image.
