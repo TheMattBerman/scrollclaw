@@ -43,16 +43,20 @@ Example: If Sarah says "she finishes the whole bowl" → cut to dog finishing th
 # B-roll with environment-matched start frame (RECOMMENDED)
 bash scripts/generate-broll.sh \
   --provider fal \
-  --image campaigns/<slug>/frames/environment-frame.png \
-  --prompt-file campaigns/<slug>/broll-prompt.txt \
-  --output campaigns/<slug>/clips/broll-01.mp4 \
+  --image workspace/campaigns/<slug>/frames/environment-frame.png \
+  --prompt-file workspace/campaigns/<slug>/broll-prompt.txt \
+  --output workspace/campaigns/<slug>/clips/b-roll-01.mp4 \
+  --log-file workspace/campaigns/<slug>/output-log.md \
+  --label b-roll-01 \
   --seconds 5
 
 # Faceless B-roll (no start frame needed)
 bash scripts/generate-broll.sh \
   --provider fal \
-  --prompt-file campaigns/<slug>/broll-prompt.txt \
-  --output campaigns/<slug>/clips/broll-02.mp4 \
+  --prompt-file workspace/campaigns/<slug>/broll-prompt.txt \
+  --output workspace/campaigns/<slug>/clips/b-roll-02.mp4 \
+  --log-file workspace/campaigns/<slug>/output-log.md \
+  --label b-roll-02 \
   --seconds 5
 ```
 
@@ -67,11 +71,56 @@ Read `references/kling-api.md` for Kling 3 endpoint details, field names, and qu
 - **AI cannot generate realistic app screens or UI text.** For product/app demos: use real screenshots or screen recordings.
 - The orchestrator doc (`references/orchestrator.md`) has the full A/B-roll split methodology
 
+## Brand Memory Integration
+
+### Reads
+| File | Purpose |
+|------|---------|
+| `workspace/campaigns/<slug>/frames/environment-frame.png` | Environment-matched start frame for Kling i2v |
+| `workspace/campaigns/<slug>/clips/a-roll-*.mp4` | Source clips to extract environment frames from |
+| `workspace/campaigns/<slug>/scripts/<format>-script.md` | B-roll segments and visual cues |
+
+### Writes
+| File | Notes |
+|------|-------|
+| `workspace/campaigns/<slug>/clips/b-roll-01.mp4` | One file per B-roll segment |
+| `workspace/campaigns/<slug>/output-log.md` | Kling prompt, duration, provider (append-only) |
+
+### Context loading
+
+```
+🎞️ B-Roll context loaded:
+  ✓ Environment frame: workspace/campaigns/ridge-q1/frames/environment-frame.png
+  ✓ A-roll clips: 3 found (workspace/campaigns/ridge-q1/clips/)
+  ✓ Script: talking-head (B-roll segments: 2)
+  ✓ Campaign: ridge-q1
+```
+
+## Contract
+
+### Input
+- Required: `[B-ROLL]` script segments plus either an environment frame or usable A-roll clips for extraction
+- Optional: product screenshots, faceless B-roll prompts, campaign brief for scene grounding
+- Format: workspace image/video files plus B-roll prompt text
+- Source: `/animate`, `/persona`, and `references/orchestrator.md`
+
+### Output
+- Produces: one visual-only B-roll clip per segment plus append-only generation logs
+- Format: MP4 files in `workspace/campaigns/<slug>/clips/` and rows in `output-log.md`
+- Default behavior: use Kling with an environment-matched start frame; for app demos, use real screenshots or recordings instead of AI UI generation
+- Downstream use: `/assemble`
+
+### Validation
+- Pre-conditions: the cut point is clear in the script and there is enough scene context to match the A-roll environment
+- Post-conditions: clip visually fits the voice beat, feels like the same world as the A-roll, and saves locally
+- Failure checks: do not accept stock-looking B-roll, mismatched rooms, or fake app UI when the product needs a real screen
+
 ## Output
 
-- B-roll clips (MP4) in `campaigns/<slug>/clips/`
-- Each clip corresponds to a `[B-ROLL]` script segment
+- B-roll clips (MP4) in `workspace/campaigns/<slug>/clips/`
+- Each clip named `b-roll-<segment>.mp4` corresponding to a `[B-ROLL]` script segment
 - Clips are visual-only — no dialogue
+- Generation params logged to `workspace/campaigns/<slug>/output-log.md`
 
 ## Next Step
 

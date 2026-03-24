@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
-# check-deps.sh — Dependency checker for sora-ugc skill
+# check-deps.sh — Dependency checker for ScrollClaw
 # Run before your first video: bash scripts/check-deps.sh
 # Exit 0 = all required deps pass. Exit 1 = something required is missing.
 
 set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 PASS="✅"
 FAIL="❌"
@@ -245,12 +248,12 @@ if [[ "$REQUIRED_FAILURES" -eq 0 ]]; then
   echo "  ✅  All required dependencies passed. You're ready to generate UGC."
   echo
   echo "  Next step: Ask Claude to create a UGC video campaign."
-  echo "  Full docs: ~/clawd/skills/sora-ugc/SKILL.md"
+  echo "  Full docs: $REPO_ROOT/SKILL.md"
   exit 0
 else
   echo "  ❌  $REQUIRED_FAILURES required dependency check(s) failed."
   echo
   echo "  Fix the issues above and re-run: bash scripts/check-deps.sh"
-  echo "  Full docs: ~/clawd/skills/sora-ugc/README.md"
+  echo "  Full docs: $REPO_ROOT/README.md"
   exit 1
 fi

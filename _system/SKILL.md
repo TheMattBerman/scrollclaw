@@ -51,7 +51,7 @@ Read `references/format-library.md` for shot-by-shot blueprints. Read `reference
 |------|-------|-------------|
 | 1. Persona research | `/persona` | Mine reviews, extract real language |
 | 2. Brand context | `/persona` | Load brand voice, know the product |
-| 3. Creator profiles | `/persona` | Lock identity in `creators/` |
+| 3. Creator profiles | `/persona` | Lock identity in `workspace/campaigns/<slug>/creators/` or `workspace/creators/` |
 | 4. Format + Script | `/persona` | Choose format, write script with visual beats |
 | 5. First frame | `/first-frame` | Nano Banana 2 → canonical face image |
 | 6. Animate (A-roll) | `/animate` | Sora 2 i2v → talking head clips |
@@ -75,13 +75,7 @@ Read `references/format-library.md` for shot-by-shot blueprints. Read `reference
 
 ## Taste Calibration
 
-**Bad prompt:** "A young woman enthusiastically reviewing a skincare product in a bright, modern bathroom"
-
-**Good prompt:** "A woman, age 26-30, slightly tired eyes, messy bun, oversized t-shirt, sitting cross-legged on an unmade bed, holding a small amber bottle close to camera, natural window light from the left, phone propped on a stack of books at slightly off-center angle, room has visible nightstand clutter — water glass, phone charger, hair tie — iPhone selfie-camera realism, not steady, not composed"
-
-**Bad script:** "I've been using this serum for two weeks now and I have to say, the results have been incredible."
-
-**Good script:** "okay so. I bought this like two weeks ago because someone on tiktok wouldn't shut up about it and I was like whatever. but um. look at this. [holds bottle up] like my dark spots are actually... they're not gone but they're definitely lighter? I don't know. I'm kind of annoyed it actually works because it's not cheap."
+Read `references/taste-calibration.md` for before/after examples that show what "anti-polish" actually sounds and looks like in practice.
 
 ## Contract
 
@@ -90,6 +84,56 @@ Read `references/format-library.md` for shot-by-shot blueprints. Read `reference
 **Output:** video clips (MP4), first-frame images (PNG), creator profiles, scripts, prompt logs. Default 9:16 vertical.
 
 **Env:** FAL_KEY (primary), REPLICATE_API_TOKEN (Nano Banana + fallback), ELEVENLABS_API_KEY (multi-clip voice), OPENROUTER_API_KEY (Gemini virality scoring).
+
+## Brand & Campaign Context
+
+ScrollClaw persists work across sessions using a structured workspace. Campaign 10 takes a fraction of campaign 1 because creator profiles, brand context, and learnings accumulate.
+
+**Full protocol:** Read `references/brand-campaign-context.md`.
+
+### Workspace structure
+
+```
+workspace/
+├── brand/                    ← Read-only for ScrollClaw (written by GrowthClaw etc.)
+│   ├── voice-profile.md      ← Brand voice → informs script tone
+│   ├── positioning.md        ← Differentiation → informs persona research
+│   └── audience.md           ← ICP → informs creator archetype selection
+├── creators/                 ← Global creator profiles (reusable across campaigns)
+└── campaigns/<slug>/
+    ├── brief.md              ← Campaign brief (from assets/campaign-brief-template.md)
+    ├── persona-research.md   ← Written by /persona
+    ├── creators/             ← Campaign-specific creator overrides
+    ├── scripts/              ← Approved scripts
+    ├── frames/               ← First frames + context frames
+    ├── clips/                ← A-roll, B-roll, assembled finals
+    ├── scores/               ← Virality score cards
+    ├── output-log.md         ← Prompt log, generation params (append-only)
+    └── learnings.md          ← What worked, what didn't (append-only)
+```
+
+### Context matrix
+
+| Skill | Reads | Writes |
+|-------|-------|--------|
+| `/persona` | `brand/{voice-profile,positioning,audience}.md`, campaign brief | `persona-research.md`, `creators/`, `scripts/` |
+| `/first-frame` | `creators/`, `scripts/`, campaign brief | `frames/`, `output-log.md` |
+| `/animate` | `frames/`, `scripts/`, `creators/` | `clips/a-roll-*.mp4`, `output-log.md` |
+| `/b-roll` | `frames/`, `clips/a-roll-*`, `scripts/` | `clips/b-roll-*.mp4`, `output-log.md` |
+| `/assemble` | `clips/*`, `scripts/`, `creators/` | `clips/final-*.mp4`, `output-log.md` |
+| `/score` | `clips/final-*`, campaign brief, `persona-research.md` | `scores/`, `learnings.md` |
+
+### Rules for reading brand memory
+
+- Check if each brand file exists before reading. Never error on missing files.
+- Show what was loaded: `✓ Loaded brand voice: conversational-direct` / `✗ No audience file — proceeding standalone`
+- ScrollClaw reads `workspace/brand/` but **never writes** there
+
+### Rules for writing campaign files
+
+- `output-log.md` and `learnings.md` are **append-only** — never overwrite
+- Creator profiles: global ones go in `workspace/creators/`, campaign overrides in `workspace/campaigns/<slug>/creators/`
+- Skills own their outputs. `/persona` owns `persona-research.md`. `/score` owns `scores/` and `learnings.md`.
 
 ## Setup
 Run `scripts/check-deps.sh` to verify all API keys and dependencies.

@@ -42,24 +42,30 @@ Read `references/motion-prompting.md` for the structured prompt format. Use labe
 # Image-to-video (RECOMMENDED — first frame locks the face)
 bash scripts/generate-clip.sh \
   --provider fal \
-  --image campaigns/<slug>/frames/frame1.png \
-  --prompt-file campaigns/<slug>/motion-prompt.txt \
-  --output campaigns/<slug>/clips/clip-01.mp4 \
+  --image workspace/campaigns/<slug>/frames/frame1.png \
+  --prompt-file workspace/campaigns/<slug>/motion-prompt.txt \
+  --output workspace/campaigns/<slug>/clips/a-roll-01.mp4 \
+  --log-file workspace/campaigns/<slug>/output-log.md \
+  --label a-roll-01 \
   --seconds 8 --aspect-ratio portrait
 
 # Text-to-video (fallback — no first frame)
 bash scripts/generate-clip.sh \
   --provider fal \
-  --prompt-file campaigns/<slug>/scene-prompt.txt \
-  --output campaigns/<slug>/clips/clip-01.mp4 \
+  --prompt-file workspace/campaigns/<slug>/scene-prompt.txt \
+  --output workspace/campaigns/<slug>/clips/a-roll-01.mp4 \
+  --log-file workspace/campaigns/<slug>/output-log.md \
+  --label a-roll-01 \
   --seconds 8 --aspect-ratio portrait
 
 # Replicate fallback (if fal.ai is down)
 bash scripts/generate-clip.sh \
   --provider replicate \
-  --image campaigns/<slug>/frames/frame1.png \
-  --prompt-file campaigns/<slug>/motion-prompt.txt \
-  --output campaigns/<slug>/clips/clip-01.mp4 \
+  --image workspace/campaigns/<slug>/frames/frame1.png \
+  --prompt-file workspace/campaigns/<slug>/motion-prompt.txt \
+  --output workspace/campaigns/<slug>/clips/a-roll-01.mp4 \
+  --log-file workspace/campaigns/<slug>/output-log.md \
+  --label a-roll-01 \
   --seconds 8 --aspect-ratio portrait
 ```
 
@@ -81,10 +87,56 @@ Sora's content filter runs AFTER generation — can fail at 99%. If blocked:
 - Keep Subject descriptions generic — the first frame already defines appearance
 - fal.ai is primary provider; Replicate is backup
 
+## Brand Memory Integration
+
+### Reads
+| File | Purpose |
+|------|---------|
+| `workspace/campaigns/<slug>/frames/frame1.png` | Canonical face — fed to Sora i2v to lock creator identity |
+| `workspace/campaigns/<slug>/scripts/<format>-script.md` | A-roll segments, dialogue, shot timing |
+| `workspace/campaigns/<slug>/creators/creator-<name>.md` | Creator energy/vibe reference for motion prompting |
+| `workspace/creators/creator-<name>.md` | Fallback if no campaign-specific profile exists |
+
+### Writes
+| File | Notes |
+|------|-------|
+| `workspace/campaigns/<slug>/clips/a-roll-01.mp4` | One file per A-roll segment |
+| `workspace/campaigns/<slug>/output-log.md` | Motion prompt, model, duration, provider (append-only) |
+
+### Context loading
+
+```
+🎥 Animate context loaded:
+  ✓ First frame: workspace/campaigns/ridge-q1/frames/frame1.png
+  ✓ Script: talking-head (A-roll segments: 3)
+  ✓ Creator: Maya
+  ✓ Campaign: ridge-q1
+```
+
+## Contract
+
+### Input
+- Required: approved `frame1.png` plus a script with `[A-ROLL]` segments
+- Optional: creator profile details, alternate prompt file, fallback provider
+- Format: workspace image and markdown files plus motion prompt text
+- Source: `/first-frame`, `/persona`, and `references/motion-prompting.md`
+
+### Output
+- Produces: one A-roll clip per `[A-ROLL]` segment plus append-only generation logs
+- Format: MP4 files in `workspace/campaigns/<slug>/clips/` and rows in `output-log.md`
+- Default behavior: use Sora image-to-video with the approved first frame; use text-to-video only as a fallback when no usable frame exists
+- Downstream use: `/b-roll` and `/assemble`
+
+### Validation
+- Pre-conditions: first frame is approved, script is tagged correctly, and the prompt includes the actual dialogue
+- Post-conditions: local MP4 is saved, creator identity holds, and lip movement/audio feel believable enough to cut into a final video
+- Failure checks: reroll or adjust the prompt if content filters fail, the hands/face break realism, or the clip is too synthetic to pass downstream
+
 ## Output
 
-- A-roll clips (MP4) in `campaigns/<slug>/clips/`
-- Each clip corresponds to an `[A-ROLL]` script segment
+- A-roll clips (MP4) in `workspace/campaigns/<slug>/clips/`
+- Each clip named `a-roll-<segment>.mp4` corresponding to an `[A-ROLL]` script segment
+- Generation params logged to `workspace/campaigns/<slug>/output-log.md`
 
 ## Next Step
 
