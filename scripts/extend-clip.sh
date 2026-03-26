@@ -19,6 +19,7 @@ SECONDS_DUR="10"
 ASPECT_RATIO="portrait"
 CHARACTER_ID=""
 PRO="false"
+PROVIDER=""
 LOG_FILE=""
 LABEL="extension"
 TIMEOUT=600
@@ -34,7 +35,8 @@ usage() {
     echo "  --seconds N           Extension duration (default: 10)"
     echo "  --aspect-ratio RATIO  9:16, 16:9, or 1:1 (default: 9:16)"
     echo "  --character-id ID     Sora character ID"
-    echo "  --pro                 Use Sora 2 Pro"
+    echo "  --pro                 Use Pro model tier"
+    echo "  --provider NAME       fal, kling, or replicate (passed to generate-clip.sh)"
     echo "  --log-file FILE       Append to output log"
     echo "  --label TEXT          Label for log entry"
     exit 1
@@ -49,6 +51,7 @@ while [[ $# -gt 0 ]]; do
         --aspect-ratio) ASPECT_RATIO="$2"; shift 2 ;;
         --character-id) CHARACTER_ID="$2"; shift 2 ;;
         --pro) PRO="true"; shift ;;
+        --provider) PROVIDER="$2"; shift 2 ;;
         --log-file) LOG_FILE="$2"; shift 2 ;;
         --label) LABEL="$2"; shift 2 ;;
         --timeout) TIMEOUT="$2"; shift 2 ;;
@@ -59,7 +62,6 @@ done
 [[ -z "$INPUT" ]] && { echo "Error: --input required"; usage; }
 [[ -z "$PROMPT_FILE" ]] && { echo "Error: --prompt-file required"; usage; }
 [[ -z "$OUTPUT" ]] && { echo "Error: --output required"; usage; }
-[[ -z "${REPLICATE_API_TOKEN:-}" ]] && { echo "Error: REPLICATE_API_TOKEN not set"; exit 2; }
 command -v ffmpeg &>/dev/null || { echo "Error: ffmpeg required for frame extraction"; exit 2; }
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -99,6 +101,7 @@ echo "Generating ${SECONDS_DUR}s extension..."
 EXTRA_ARGS="--image $FRAME_URL"
 [[ -n "$CHARACTER_ID" ]] && EXTRA_ARGS="$EXTRA_ARGS --character-id $CHARACTER_ID"
 [[ "$PRO" == "true" ]] && EXTRA_ARGS="$EXTRA_ARGS --pro"
+[[ -n "$PROVIDER" ]] && EXTRA_ARGS="$EXTRA_ARGS --provider $PROVIDER"
 [[ -n "$LOG_FILE" ]] && EXTRA_ARGS="$EXTRA_ARGS --log-file $LOG_FILE"
 
 bash "$SCRIPT_DIR/generate-clip.sh" \
