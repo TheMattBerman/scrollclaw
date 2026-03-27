@@ -188,7 +188,7 @@ ScrollClaw persists work across sessions so campaign 10 takes a fraction of camp
 
 ```
 workspace/
-├── brand/                      ← Read-only for ScrollClaw (GrowthClaw or manual — see assets/ for templates)
+├── brand/                      ← Written by /brand-setup (recommended), GrowthClaw, or manually from assets/ templates
 │   ├── voice-profile.md        ← Informs script tone
 │   ├── positioning.md          ← Informs persona research direction
 │   └── audience.md             ← Anchors creator archetype selection
