@@ -150,7 +150,7 @@ PRESETS = {
         "size": 38,
         "fill": (247, 247, 242, 240),         # muted warm white, 94% opacity
         "stroke_color": (0, 0, 0, 255),        # pure black
-        "stroke_width": 3,                      # nearest int to 2.5px (PIL uses int)
+        "stroke_width": 2.5,                     # PIL accepts float
         "align": "center",
         "y_start": 280,                         # safe zone
         "line_height": 50,
@@ -222,7 +222,7 @@ def generate_caption(config):
     size = config.get("size", 38)
     fill = tuple(config.get("fill", (247, 247, 242, 240)))
     stroke_color = tuple(config.get("stroke_color", (0, 0, 0, 255)))
-    stroke_width = int(config.get("stroke_width", 3))
+    stroke_width = float(config.get("stroke_width", 2.5))
     align = config.get("align", "center")
     y_start = config.get("y_start", 280)
     line_height = config.get("line_height", 50)
@@ -234,7 +234,7 @@ def generate_caption(config):
     scaled_size = int(size * scale)
     scaled_y = int(y_start * scale)
     scaled_lh = int(line_height * scale)
-    scaled_stroke = max(1, int(stroke_width * scale))
+    scaled_stroke = max(1.0, stroke_width * scale)
 
     # Find font
     font_path = find_font(font_weight)

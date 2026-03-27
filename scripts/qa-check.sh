@@ -56,9 +56,9 @@ SCENES=5
 while [[ $# -gt 0 ]]; do
   case "$1" in
     -h|--help) usage ;;
-    --timestamps) TIMESTAMPS="$2"; shift 2 ;;
-    --output-dir) OUTPUT_DIR="$2"; shift 2 ;;
-    --scenes) SCENES="$2"; shift 2 ;;
+    --timestamps) [[ $# -ge 2 ]] || { echo "Error: --timestamps requires a value"; exit 1; }; TIMESTAMPS="$2"; shift 2 ;;
+    --output-dir) [[ $# -ge 2 ]] || { echo "Error: --output-dir requires a value"; exit 1; }; OUTPUT_DIR="$2"; shift 2 ;;
+    --scenes) [[ $# -ge 2 ]] || { echo "Error: --scenes requires a value"; exit 1; }; SCENES="$2"; shift 2 ;;
     *) VIDEO="$1"; shift ;;
   esac
 done
@@ -259,4 +259,4 @@ else
 fi
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-exit $FAILURES
+exit $((FAILURES > 0 ? 1 : 0))

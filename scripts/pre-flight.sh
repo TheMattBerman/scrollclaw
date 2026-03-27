@@ -260,4 +260,4 @@ else
 fi
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-exit $FAILURES
+exit $((FAILURES > 0 ? 1 : 0))
