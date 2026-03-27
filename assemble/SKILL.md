@@ -93,28 +93,66 @@ Read `references/green-zone.md` for platform safe zones.
 
 ## Stage 3: Captions (ALWAYS LAST)
 
-**⚠️ Captions MUST be applied AFTER post-production, not before.** Grain and color grade degrade clean caption pills.
+**⚠️ Captions MUST be applied AFTER post-production, not before.** Grain and color grade degrade clean caption text. This was the #1 process mistake in session 2.
+
+### Caption Overlay System
+
+Use `assemble/scripts/caption-overlay.py` for all text overlays. It generates transparent PNGs with TikTok-native styling, auto-detects video resolution, and downloads TikTok Sans from Google Fonts if not cached.
 
 ```bash
-# Auto-detect video resolution and generate matching caption overlay
-/usr/bin/python3 scripts/generate-caption.py \
+# Generate caption overlay (auto-detects resolution from video)
+python3 assemble/scripts/caption-overlay.py \
   --video workspace/campaigns/<slug>/clips/post-produced.mp4 \
-  --lines "when your gym software,cannot even handle,a data migration..." \
+  --preset tiktok-wall \
+  --lines "things i didn't know,would bother me about,my boyfriend..." \
   --output workspace/campaigns/<slug>/frames/caption.png
 
-# Overlay onto post-produced video
-/usr/bin/ffmpeg -i workspace/campaigns/<slug>/clips/post-produced.mp4 -i workspace/campaigns/<slug>/frames/caption.png \
+# Overlay onto post-produced video (with compatible encoding)
+ffmpeg -i workspace/campaigns/<slug>/clips/post-produced.mp4 \
+  -i workspace/campaigns/<slug>/frames/caption.png \
   -filter_complex "[0:v][1:v]overlay=0:0:enable='between(t,0.2,3.8)'" \
-  -c:v libx264 -preset fast -crf 18 -c:a copy workspace/campaigns/<slug>/clips/final-01.mp4
+  -c:v libx264 -profile:v main -pix_fmt yuv420p -crf 18 \
+  -movflags +faststart -c:a copy \
+  workspace/campaigns/<slug>/clips/final-01.mp4
 ```
 
-**Critical:** caption PNG must match EXACT video resolution. Use `--video` flag to auto-detect. Mismatched resolutions cause off-center captions.
+### Approved TikTok Text Presets
 
-Style: Inter SemiBold, white pills per line, #0A1931 text, 15px radius, auto-scaled to video resolution.
+| Preset | Use For | Font | Size | Color | Stroke |
+|--------|---------|------|------|-------|--------|
+| `tiktok-wall` | Wall of Text format, dense overlays | TikTok Sans Regular | 38px | #F7F7F2 94% opacity | 2.5px pure black |
+| `tiktok-hook` | Hook captions, opening text | TikTok Sans Bold | 52px | #FFFFFF 100% | 3px pure black |
+| `tiktok-scene` | Scene-by-scene captions | TikTok Sans Regular | 32px | #F7F7F2 94% opacity | 2px pure black |
+| `tiktok-dense` | Dense multi-line overlays | TikTok Sans Regular | 28px | #F7F7F2 94% opacity | 2px pure black |
+
+All presets use centered alignment and safe zone positioning (y=280 at 720x1280 base). Values scale automatically for other resolutions.
+
+### Full control via JSON config
+
+For per-scene caption configs, pass a JSON file:
+
+```bash
+python3 assemble/scripts/caption-overlay.py \
+  --config workspace/campaigns/<slug>/scripts/captions.json \
+  --output workspace/campaigns/<slug>/frames/caption-s1.png
+```
+
+### Legacy pill-style captions
+
+The older `scripts/generate-caption.py` still supports pill-style (white rounded rect background) and wall-style captions using Inter font. Use `assemble/scripts/caption-overlay.py` for all new work — it has the correct TikTok-native styling.
+
+### Caption rules
+
+- **Caption PNG must match EXACT video resolution.** Use `--video` flag to auto-detect.
+- **Use PIL for text overlays** — more control than ffmpeg drawtext, no escaping issues.
+- **Use textfile approach** if ffmpeg drawtext is ever needed (avoids apostrophe/escaping bugs).
+- **Visual Transformation format requires captions on EVERY scene**, not just the hook.
+- **No background pills** for TikTok-native text — stroke only.
+- **Always encode with compatible defaults** after caption burn: `-profile:v main -pix_fmt yuv420p -movflags +faststart`
 
 Resolution note: Sora outputs 720x1280, Kling outputs 1076x1924. Always normalize to one resolution before stitching.
 
-Requires `/usr/bin/ffmpeg` (apt version with libfreetype) and `/usr/bin/python3` with PIL.
+Requires `ffmpeg` and `python3` with Pillow (auto-installed if missing).
 
 ## Brand Memory Integration
 

@@ -135,5 +135,52 @@ workspace/
 - Creator profiles: global ones go in `workspace/creators/`, campaign overrides in `workspace/campaigns/<slug>/creators/`
 - Skills own their outputs. `/persona` owns `persona-research.md`. `/score` owns `scores/` and `learnings.md`.
 
+## Common Mistakes (from live production sessions)
+
+These mistakes have been made in real sessions. Every one of them wasted time and tokens. Do not repeat them.
+
+### Never generate random people — always use creator reference
+
+The creator system exists to lock visual identity. Every first frame must be generated from the creator's canonical reference image using i2v. Generating 7 random people instead of using Jess's locked reference was the biggest waste in session 2.
+
+**Wrong:** text-to-image → random person → animate
+**Right:** reference image → Nano Banana 2 → first frame → Sora 2 i2v
+
+### Never use text-to-video for established creators — always i2v
+
+t2v generates a completely different person every time. Once a creator has a reference image, always use image-to-video. The only acceptable use of t2v is initial exploration before a reference is locked.
+
+### Never caption before post-production
+
+Grain degrades caption text. Color grading shifts caption colors. The order is non-negotiable:
+
+```
+raw clips → stitch → post-produce → THEN captions (LAST)
+```
+
+### Always QA with vision model after stitch
+
+Use Gemini Flash to scrub every clip frame-by-frame after stitching. It catches content drift (wrong person appearing mid-clip), hand artifacts, and scene inconsistencies that are easy to miss on a quick watch. Don't wait for the user to catch problems.
+
+### Always use compatible encoding defaults
+
+```bash
+-c:v libx264 -profile:v main -pix_fmt yuv420p -crf 23 -preset medium -movflags +faststart -c:a aac -b:a 128k -ar 44100
+```
+
+`yuv444p` and `High 4:4:4 Predictive` profile break Telegram Web, many mobile browsers, and some social platforms. Always `yuv420p` + `main` profile + `faststart`. Do this from the first encode, not as a fix after delivery fails.
+
+### Always run pre-flight before generating
+
+```bash
+bash scripts/pre-flight.sh <campaign-slug>
+```
+
+Validates workspace structure, creator profiles, reference images, scripts, and caption plans. Catches missing prerequisites before you waste API calls.
+
+### Follow the production pipeline order
+
+Read `references/production-pipeline.md` for the strict step-by-step sequence. Every step depends on the previous one being done correctly.
+
 ## Setup
 Run `scripts/check-deps.sh` to verify all API keys and dependencies.
