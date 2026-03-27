@@ -103,7 +103,34 @@ else
 fi
 
 # ─────────────────────────────────────────────
-# 2. Creator profile
+# 2. Brand context (warn-only — not required)
+# ─────────────────────────────────────────────
+
+header "Brand Context"
+
+BRAND_DIR="$REPO_ROOT/workspace/brand"
+BRAND_FILES=("voice-profile.md" "positioning.md" "audience.md")
+BRAND_FOUND=0
+
+for bf in "${BRAND_FILES[@]}"; do
+  if [[ -f "$BRAND_DIR/$bf" ]]; then
+    pass "$bf"
+    BRAND_FOUND=$((BRAND_FOUND + 1))
+  else
+    warn "$bf not found — persona research will infer from campaign brief only"
+  fi
+done
+
+if [[ $BRAND_FOUND -eq 0 ]]; then
+  info "No brand files found. Copy templates to get started:"
+  info "  mkdir -p workspace/brand"
+  info "  cp assets/voice-profile-template.md workspace/brand/voice-profile.md"
+  info "  cp assets/positioning-template.md workspace/brand/positioning.md"
+  info "  cp assets/audience-template.md workspace/brand/audience.md"
+fi
+
+# ─────────────────────────────────────────────
+# 3. Creator profile
 # ─────────────────────────────────────────────
 
 header "Creator Profile"
@@ -133,7 +160,7 @@ else
 fi
 
 # ─────────────────────────────────────────────
-# 3. Reference image for i2v
+# 4. Reference image for i2v
 # ─────────────────────────────────────────────
 
 header "Reference Image"
@@ -163,7 +190,7 @@ else
 fi
 
 # ─────────────────────────────────────────────
-# 4. Script with segment mapping
+# 5. Script with segment mapping
 # ─────────────────────────────────────────────
 
 header "Script"
@@ -197,7 +224,7 @@ else
 fi
 
 # ─────────────────────────────────────────────
-# 5. Caption plan
+# 6. Caption plan
 # ─────────────────────────────────────────────
 
 header "Caption Plan"
@@ -226,7 +253,7 @@ if [[ "$HAS_CAPTION_PLAN" == "false" ]]; then
 fi
 
 # ─────────────────────────────────────────────
-# 6. Text style parameters
+# 7. Text style parameters
 # ─────────────────────────────────────────────
 
 header "Text Style"

@@ -14,7 +14,7 @@ Campaign 10 should take a fraction of campaign 1. Creator profiles get reused. L
 
 ```
 workspace/
-├── brand/                          ← Read-only for ScrollClaw. Written by GrowthClaw or manually.
+├── brand/                          ← Read-only for ScrollClaw. Written by GrowthClaw or manually from templates.
 │   ├── voice-profile.md            ← Brand voice, tone, language style
 │   ├── positioning.md              ← What the brand stands for, how it differentiates
 │   └── audience.md                 ← ICP, customer archetypes, demographics
@@ -47,7 +47,14 @@ workspace/
 
 ## Brand Context Integration
 
-ScrollClaw is a good citizen in a larger skill ecosystem. It **reads** from `workspace/brand/` but **never writes** there. Writing brand files is the job of brand-focused skills (GrowthClaw, brand-voice, etc.).
+ScrollClaw is a good citizen in a larger skill ecosystem. It **reads** from `workspace/brand/` but **never writes** there. Writing brand files is the job of brand-focused skills (GrowthClaw, brand-voice, etc.) or the user manually. If you don't have GrowthClaw, copy the templates from `assets/` and fill them in:
+
+```bash
+mkdir -p workspace/brand
+cp assets/voice-profile-template.md workspace/brand/voice-profile.md
+cp assets/positioning-template.md workspace/brand/positioning.md
+cp assets/audience-template.md workspace/brand/audience.md
+```
 
 ### What gets read and how
 
