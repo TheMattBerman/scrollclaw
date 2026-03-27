@@ -35,7 +35,7 @@ Brand + Audience
 │  2. Creator profile         │  ← persistent AI "creator" with locked identity
 │  3. Format + script         │  ← 6 formats with shot-by-shot enforcement
 │  4. First frame (Nano Banana)│  ← iPhone-realistic, not AI-looking
-│  5. A-roll (Sora 2)        │  ← talking head with synced voice + lip sync
+│  5. A-roll (Sora 2 → Kling 3)│ ← talking head with synced voice + lip sync
 │  6. B-roll (Kling 3)       │  ← fast contextual scenes, env-matched
 │  7. Audio orchestration     │  ← native voice, continuous over B-roll
 │  8. Post-production         │  ← color grade, grain, frame rate
@@ -84,17 +84,26 @@ bash scripts/check-deps.sh
 
 ## Quick start — your first video in 20 minutes
 
-1. **Run the dependency check** to make sure everything's configured
-2. **Tell the skill what brand and who the audience is** — it handles persona research
-3. **Pick a format** — the skill recommends one based on your goal
-4. **Approve the script** — it writes one mapped to the format's shot breakdown
-5. **Generate the first frame** — review it before committing to video
-6. **Generate video + B-roll** — Sora for talking head, Kling for B-roll scenes
-7. **Post-production + captions** — automated color grade, grain, caption overlay
-8. **Virality score** — only publish if it scores 70+
+1. **Set up brand context** — if you have GrowthClaw, it writes `workspace/brand/` for you. If not, copy the templates from `assets/` and fill them in manually:
+   ```bash
+   mkdir -p workspace/brand
+   cp assets/voice-profile-template.md workspace/brand/voice-profile.md
+   cp assets/positioning-template.md workspace/brand/positioning.md
+   cp assets/audience-template.md workspace/brand/audience.md
+   ```
+2. **Run the dependency check** to make sure everything's configured
+3. **Tell the skill what brand and who the audience is** — it handles persona research
+4. **Pick a format** — the skill recommends one based on your goal
+5. **Approve the script** — it writes one mapped to the format's shot breakdown
+6. **Generate the first frame** — review it before committing to video
+7. **Generate video + B-roll** — Sora 2 (or Kling 3 fallback) for talking head, Kling for B-roll scenes
+8. **Post-production + captions** — automated color grade, grain, caption overlay
+9. **Virality score** — only publish if it scores 70+
 
 ## Key findings from testing
 
+- **Sora 2 API is being deprecated.** Kling 3 is the primary fallback and may become the default A-roll provider. The pipeline handles this automatically via `generate-clip.sh`, or use `--provider kling` to skip Sora entirely.
+- **Kling 3 is the go-to for B-roll AND A-roll fallback.** It has no content safety filter, supports 3–15s durations, and produces consistent results for both talking head and environment shots.
 - **Sora's native voice is always better than ElevenLabs TTS** for talking head. TTS sounds fake. Sora does voice + lip sync together.
 - **B-roll must be environment-matched.** Extract a frame from the A-roll → feed to Kling. Generic B-roll looks like stock footage.
 - **Captions go LAST** — after post-production. Grain degrades caption pills.
@@ -134,7 +143,7 @@ scrollclaw/
 │   └── references/
 │       ├── first-frame-prompting.md
 │       └── first-frame-psychology.md
-├── animate/                    Step 3: A-roll (Sora 2)
+├── animate/                    Step 3: A-roll (Sora 2 → Kling 3)
 │   ├── SKILL.md
 │   └── references/
 │       ├── motion-prompting.md
@@ -158,7 +167,7 @@ scrollclaw/
 │       └── virality-scoring.md
 ├── scripts/                    10 automation scripts
 ├── evals/                      Baseline, trigger, and execution benchmarks
-└── assets/                     Campaign brief template
+└── assets/                     Campaign brief + brand templates
 ```
 
 ## Brand & Campaign Context
@@ -167,7 +176,7 @@ ScrollClaw persists work across sessions so campaign 10 takes a fraction of camp
 
 ```
 workspace/
-├── brand/                      ← Read-only for ScrollClaw (GrowthClaw or manual)
+├── brand/                      ← Read-only for ScrollClaw (GrowthClaw or manual — see assets/ for templates)
 │   ├── voice-profile.md        ← Informs script tone
 │   ├── positioning.md          ← Informs persona research direction
 │   └── audience.md             ← Anchors creator archetype selection
