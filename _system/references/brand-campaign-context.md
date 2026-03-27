@@ -14,7 +14,7 @@ Campaign 10 should take a fraction of campaign 1. Creator profiles get reused. L
 
 ```
 workspace/
-├── brand/                          ← Read-only for ScrollClaw. Written by GrowthClaw or manually from templates.
+├── brand/                          ← Read-only for ScrollClaw. Written by /brand-setup, GrowthClaw, or manually from templates.
 │   ├── voice-profile.md            ← Brand voice, tone, language style
 │   ├── positioning.md              ← What the brand stands for, how it differentiates
 │   └── audience.md                 ← ICP, customer archetypes, demographics
@@ -47,14 +47,25 @@ workspace/
 
 ## Brand Context Integration
 
-ScrollClaw is a good citizen in a larger skill ecosystem. It **reads** from `workspace/brand/` but **never writes** there. Writing brand files is the job of brand-focused skills (GrowthClaw, brand-voice, etc.) or the user manually. If you don't have GrowthClaw, copy the templates from `assets/` and fill them in:
+ScrollClaw is a good citizen in a larger skill ecosystem. It **reads** from `workspace/brand/` but **never writes** there (except `/brand-setup`, which is the one-time writer). There are three ways to populate `workspace/brand/`:
+
+### How to populate brand files (pick one)
+
+| Method | When to use | How |
+|--------|-------------|-----|
+| **`/brand-setup`** (recommended) | New brand, no existing context | Provide brand name + URL. Researches and auto-generates all three files. |
+| **GrowthClaw** | If you have GrowthClaw in your skill ecosystem | GrowthClaw writes brand files as part of its growth strategy workflow. |
+| **Manual templates** (fallback) | Quick start or brands with existing guidelines | Copy templates from `assets/` and fill them in manually. |
 
 ```bash
+# Manual template approach (fallback):
 mkdir -p workspace/brand
 cp assets/voice-profile-template.md workspace/brand/voice-profile.md
 cp assets/positioning-template.md workspace/brand/positioning.md
 cp assets/audience-template.md workspace/brand/audience.md
 ```
+
+`/brand-setup` is the recommended path for most users. It runs once per brand, before any campaign work. The files it generates are read-only after creation — `/brand-setup` writes them, everything else reads them.
 
 ### What gets read and how
 
@@ -87,6 +98,7 @@ Which sub-skills read and write which files.
 
 | Skill | Reads | Writes |
 |-------|-------|--------|
+| `/brand-setup` | Brand website, social profiles, reviews, competitors (scraped) | `workspace/brand/voice-profile.md`<br>`workspace/brand/positioning.md`<br>`workspace/brand/audience.md` |
 | `/persona` | `workspace/brand/voice-profile.md`<br>`workspace/brand/positioning.md`<br>`workspace/brand/audience.md`<br>`campaigns/<slug>/brief.md` | `campaigns/<slug>/persona-research.md`<br>`campaigns/<slug>/creators/creator-<name>.md`<br>`workspace/creators/creator-<name>.md` (global profiles)<br>`campaigns/<slug>/scripts/<format>-script.md` |
 | `/first-frame` | `campaigns/<slug>/creators/creator-<name>.md`<br>`campaigns/<slug>/scripts/<format>-script.md`<br>`campaigns/<slug>/brief.md` | `campaigns/<slug>/frames/frame1.png`<br>`campaigns/<slug>/frames/environment-frame.png`<br>`campaigns/<slug>/output-log.md` |
 | `/animate` | `campaigns/<slug>/frames/frame1.png`<br>`campaigns/<slug>/scripts/<format>-script.md`<br>`campaigns/<slug>/creators/creator-<name>.md` | `campaigns/<slug>/clips/a-roll-*.mp4`<br>`campaigns/<slug>/output-log.md` |

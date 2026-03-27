@@ -28,6 +28,12 @@ Not by adding filters after. By building the entire pipeline around anti-polish:
 ## What it produces
 
 ```
+Brand name + URL
+      ↓
+┌─────────────────────────────┐
+│  0. Brand setup (/brand-setup)│ ← one-time: research brand, generate context files
+└─────────────────────────────┘
+      ↓
 Brand + Audience
       ↓
 ┌─────────────────────────────┐
@@ -84,8 +90,10 @@ bash scripts/check-deps.sh
 
 ## Quick start — your first video in 20 minutes
 
-1. **Set up brand context** — if you have GrowthClaw, it writes `workspace/brand/` for you. If not, copy the templates from `assets/` and fill them in manually:
+1. **Set up brand context** — run `/brand-setup` with your brand name and URL. It researches the brand and auto-generates all three files in `workspace/brand/`. Alternatively, if you have GrowthClaw it writes these for you, or copy the templates from `assets/` and fill them in manually:
    ```bash
+   # Option A (recommended): /brand-setup — automatic research + generation
+   # Option B: manual templates
    mkdir -p workspace/brand
    cp assets/voice-profile-template.md workspace/brand/voice-profile.md
    cp assets/positioning-template.md workspace/brand/positioning.md
@@ -133,6 +141,10 @@ scrollclaw/
 │       ├── format-library.md
 │       ├── hook-emotions.md
 │       └── taste-calibration.md
+├── brand-setup/                Step 0: One-time brand research + file generation
+│   ├── SKILL.md
+│   └── references/
+│       └── research-protocol.md
 ├── persona/                    Step 1: Persona research + scripting
 │   ├── SKILL.md
 │   └── references/
@@ -176,7 +188,7 @@ ScrollClaw persists work across sessions so campaign 10 takes a fraction of camp
 
 ```
 workspace/
-├── brand/                      ← Read-only for ScrollClaw (GrowthClaw or manual — see assets/ for templates)
+├── brand/                      ← Written by /brand-setup (recommended), GrowthClaw, or manually from assets/ templates
 │   ├── voice-profile.md        ← Informs script tone
 │   ├── positioning.md          ← Informs persona research direction
 │   └── audience.md             ← Anchors creator archetype selection

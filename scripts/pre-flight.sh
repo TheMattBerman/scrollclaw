@@ -122,7 +122,8 @@ for bf in "${BRAND_FILES[@]}"; do
 done
 
 if [[ $BRAND_FOUND -eq 0 ]]; then
-  info "No brand files found. Copy templates to get started:"
+  info "No brand files found. Run /brand-setup with your brand name + URL (recommended),"
+  info "or copy templates manually:"
   info "  mkdir -p workspace/brand"
   info "  cp assets/voice-profile-template.md workspace/brand/voice-profile.md"
   info "  cp assets/positioning-template.md workspace/brand/positioning.md"
