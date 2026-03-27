@@ -49,6 +49,7 @@ Read `references/format-library.md` for shot-by-shot blueprints. Read `reference
 
 | Step | Skill | What happens |
 |------|-------|-------------|
+| 0. Brand setup (one-time) | `/brand-setup` | Research brand, generate voice/positioning/audience files |
 | 1. Persona research | `/persona` | Mine reviews, extract real language |
 | 2. Brand context | `/persona` | Load brand voice, know the product |
 | 3. Creator profiles | `/persona` | Lock identity in `workspace/campaigns/<slug>/creators/` or `workspace/creators/` |
@@ -95,7 +96,7 @@ ScrollClaw persists work across sessions using a structured workspace. Campaign 
 
 ```
 workspace/
-├── brand/                    ← Read-only for ScrollClaw (written by GrowthClaw etc.)
+├── brand/                    ← Read-only for ScrollClaw (written by /brand-setup, GrowthClaw, or manually)
 │   ├── voice-profile.md      ← Brand voice → informs script tone
 │   ├── positioning.md        ← Differentiation → informs persona research
 │   └── audience.md           ← ICP → informs creator archetype selection
@@ -116,6 +117,7 @@ workspace/
 
 | Skill | Reads | Writes |
 |-------|-------|--------|
+| `/brand-setup` | Brand website, social profiles, reviews, competitors (scraped) | `brand/voice-profile.md`, `brand/positioning.md`, `brand/audience.md` |
 | `/persona` | `brand/{voice-profile,positioning,audience}.md`, campaign brief | `persona-research.md`, `creators/`, `scripts/` |
 | `/first-frame` | `creators/`, `scripts/`, campaign brief | `frames/`, `output-log.md` |
 | `/animate` | `frames/`, `scripts/`, `creators/` | `clips/a-roll-*.mp4`, `output-log.md` |

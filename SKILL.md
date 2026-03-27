@@ -24,6 +24,10 @@ AI-generated UGC videos that look like a real person pulled out their phone and 
 ## The Pipeline
 
 ```
+Brand name + URL
+      ↓
+/brand-setup → One-time brand research + file generation (Step 0)
+      ↓
 Brand + Audience
       ↓
 /persona    → Persona research, creator profiles, approved script
@@ -48,6 +52,7 @@ When the user invokes ScrollClaw or asks about UGC video, route to the right sub
 
 | User says / wants | Route to |
 |-------------------|----------|
+| "Set up a brand" / "Initialize brand" / "New brand" / "Brand research" | `/brand-setup` — one-time, before first campaign |
 | "Make me a UGC video" / "Start a campaign" / "I need ugc" | `/persona` — start at the beginning |
 | "Research this brand" / "Create a creator profile" / "Write a script" | `/persona` |
 | "Generate the first frame" / "Make a face image" / "Nano Banana" | `/first-frame` |
@@ -87,7 +92,10 @@ If the user isn't sure where they are, ask: **"Where are you in the pipeline?"**
 ## Quick Start
 
 **First campaign:**
-1. Initialize workspace:
+1. Set up brand context (one-time per brand):
+   - **Recommended:** Run `/brand-setup` with your brand name + URL — it researches and generates all three brand files automatically
+   - **Alternative:** Copy templates from `assets/` and fill in manually (see `assets/` for templates)
+2. Initialize workspace:
    ```bash
    CAMPAIGN="my-campaign"
    mkdir -p workspace/campaigns/$CAMPAIGN/{creators,scripts,frames,clips,scores}
@@ -95,8 +103,8 @@ If the user isn't sure where they are, ask: **"Where are you in the pipeline?"**
    touch workspace/campaigns/$CAMPAIGN/output-log.md
    touch workspace/campaigns/$CAMPAIGN/learnings.md
    ```
-2. Fill in `workspace/campaigns/$CAMPAIGN/brief.md`
-3. Run `/persona` → `/first-frame` → `/animate` → `/b-roll` → `/assemble` → `/score`
+3. Fill in `workspace/campaigns/$CAMPAIGN/brief.md`
+4. Run `/persona` → `/first-frame` → `/animate` → `/b-roll` → `/assemble` → `/score`
 
 **Check setup first:**
 ```bash
