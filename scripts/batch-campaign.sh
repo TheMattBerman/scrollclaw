@@ -23,6 +23,7 @@ FORMATS=""
 SECONDS_DUR="8"
 DUAL_OUTPUT=""
 PRO=""
+PROVIDER=""
 CHARACTER_IDS_FILE=""
 DRY_RUN="false"
 
@@ -35,7 +36,8 @@ usage() {
     echo "  --formats LIST        Comma-separated format names (required)"
     echo "  --seconds N           Duration per clip (default: 8)"
     echo "  --dual-output         Generate both 16:9 and 9:16"
-    echo "  --pro                 Use Sora 2 Pro"
+    echo "  --pro                 Use Pro model tier"
+    echo "  --provider NAME       fal, kling, or replicate (default: fal)"
     echo "  --character-ids FILE  JSON file mapping creator names to character_ids"
     echo "  --dry-run             Show what would be generated without running"
     exit 1
@@ -49,6 +51,7 @@ while [[ $# -gt 0 ]]; do
         --seconds) SECONDS_DUR="$2"; shift 2 ;;
         --dual-output) DUAL_OUTPUT="--dual-output"; shift ;;
         --pro) PRO="--pro"; shift ;;
+        --provider) PROVIDER="$2"; shift 2 ;;
         --character-ids) CHARACTER_IDS_FILE="$2"; shift 2 ;;
         --dry-run) DRY_RUN="true"; shift ;;
         *) echo "Unknown option: $1"; usage ;;
@@ -58,7 +61,6 @@ done
 [[ -z "$WORKSPACE" ]] && { echo "Error: --workspace required"; usage; }
 [[ -z "$CREATORS_DIR" ]] && { echo "Error: --creators required"; usage; }
 [[ -z "$FORMATS" ]] && { echo "Error: --formats required"; usage; }
-[[ -z "${REPLICATE_API_TOKEN:-}" ]] && { echo "Error: REPLICATE_API_TOKEN not set"; exit 2; }
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
@@ -125,6 +127,7 @@ for CREATOR_FILE in "${CREATOR_FILES[@]}"; do
 
         EXTRA_ARGS=()
         [[ -n "$PRO" ]] && EXTRA_ARGS+=("$PRO")
+        [[ -n "$PROVIDER" ]] && EXTRA_ARGS+=("--provider" "$PROVIDER")
 
         if bash "$SCRIPT_DIR/generate-clip.sh" \
             --prompt-file "$PROMPT_FILE" \

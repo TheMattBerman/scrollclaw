@@ -1,6 +1,6 @@
 ---
 name: scrollclaw-animate
-description: "Animate first frames into A-roll talking head clips with Sora 2 via fal.ai. Motion prompting, dialogue sync, and content filter handling."
+description: "Animate first frames into A-roll talking head clips. Uses Sora 2 via fal.ai (primary) with Kling 3 auto-fallback when Sora is unavailable or sunset."
 metadata:
   openclaw:
     emoji: "🎥"
@@ -12,11 +12,15 @@ metadata:
       - "a-roll"
       - "talking head clip"
       - "sora video"
+      - "kling animate"
+      - "kling a-roll"
 ---
 
 # Animate (A-Roll)
 
-Sora 2 turns first frames into talking head clips with synced lip movement and audio. Image-to-video is the default — text-to-video is the fallback.
+Turns first frames into talking head clips with synced lip movement and audio. Image-to-video is the default — text-to-video is the fallback.
+
+**Fallback chain:** Sora 2 (fal.ai) -> Kling 3 (fal.ai) -> Kling 3 (Replicate). Use `--provider kling` to skip Sora entirely (for when Sora is sunset).
 
 ## Prerequisites
 
@@ -58,7 +62,17 @@ bash scripts/generate-clip.sh \
   --label a-roll-01 \
   --seconds 8 --aspect-ratio portrait
 
-# Replicate fallback (if fal.ai is down)
+# Kling direct (skip Sora — use when Sora is sunset)
+bash scripts/generate-clip.sh \
+  --provider kling \
+  --image workspace/campaigns/<slug>/frames/frame1.png \
+  --prompt-file workspace/campaigns/<slug>/motion-prompt.txt \
+  --output workspace/campaigns/<slug>/clips/a-roll-01.mp4 \
+  --log-file workspace/campaigns/<slug>/output-log.md \
+  --label a-roll-01 \
+  --seconds 8 --aspect-ratio portrait
+
+# Replicate Sora (legacy — may stop working when Sora is sunset)
 bash scripts/generate-clip.sh \
   --provider replicate \
   --image workspace/campaigns/<slug>/frames/frame1.png \
@@ -71,7 +85,7 @@ bash scripts/generate-clip.sh \
 
 ## API Reference
 
-Read `references/sora-api.md` for endpoint details, queue workflow, field names, and duration options. fal.ai supports 4/8/12/16/20s. Replicate is limited to 4/8/12.
+Read `references/sora-api.md` for endpoint details, queue workflow, field names, and duration options. Sora fal.ai supports 4/8/12/16/20s. Kling supports 3-15s (durations >15s are auto-clamped). Replicate Sora is limited to 4/8/12.
 
 ## Content Filter Handling
 
@@ -79,13 +93,15 @@ Sora's content filter runs AFTER generation — can fail at 99%. If blocked:
 - Soften the motion prompt (keep first frame)
 - Remove any potentially sensitive descriptions
 - Retry with adjusted prompt
+- Or use `--provider kling` — Kling has no content safety filter
 
 ## Key Findings
 
 - Include actual script in Dialogue field — Sora generates synced lip movement
 - For podcast audio: describe the RESULT, not the gear
 - Keep Subject descriptions generic — the first frame already defines appearance
-- fal.ai is primary provider; Replicate is backup
+- fal.ai is primary provider; Kling 3 is auto-fallback when Sora fails or is sunset
+- Use `--provider kling` to skip Sora entirely
 
 ## Brand Memory Integration
 

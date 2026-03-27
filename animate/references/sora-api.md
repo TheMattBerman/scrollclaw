@@ -1,11 +1,11 @@
 # Video API Reference
 
-# Video API Reference
-
 Single source of truth for all video generation endpoints. Based on real testing, not documentation speculation.
 
-**Primary provider:** fal.ai (better features, longer duration, correct field names)
-**Fallback provider:** Replicate (Nano Banana first frames, backup for Sora/Kling)
+**A-roll primary:** fal.ai Sora 2 (talking head with synced dialogue)
+**A-roll fallback:** fal.ai Kling 3 (when Sora is unavailable/sunset)
+**Final fallback:** Replicate Kling 3 (when fal.ai is down)
+**Image generation:** Replicate only (Nano Banana first frames)
 
 ---
 
@@ -129,6 +129,85 @@ The `fal-ai/sora-2/characters` endpoint exists but **blocks AI-generated faces**
 
 ---
 
+## fal.ai — Kling 3 (A-ROLL FALLBACK)
+
+Auto-fallback when Sora fails or is sunset. Use `--provider kling` to skip Sora entirely.
+
+**Key difference from B-roll usage:** A-roll requires `generate_audio: true` for dialogue lip-sync. No content safety filter (advantage over Sora).
+
+### Endpoints
+
+| Use | Endpoint |
+|-----|----------|
+| Text-to-Video Pro | `fal-ai/kling-video/v3/pro/text-to-video` |
+| Image-to-Video Pro | `fal-ai/kling-video/v3/pro/image-to-video` |
+| Text-to-Video Standard | `fal-ai/kling-video/v3/standard/text-to-video` |
+| Image-to-Video Standard | `fal-ai/kling-video/v3/standard/image-to-video` |
+
+### Queue workflow
+
+Same as Sora — submit to full endpoint path, poll using the returned `status_url`.
+
+### Image-to-Video input schema (A-roll)
+
+| Field | Type | Required | Values | Notes |
+|-------|------|----------|--------|-------|
+| prompt | string | yes | free text | Motion/dialogue description |
+| start_image_url | string | yes | URL | **Field is `start_image_url`** not `image_url`. First frame. |
+| duration | integer | no | 3-15 | Integer, not enum. Clips >15s are clamped. |
+| aspect_ratio | enum | no | "9:16", "16:9", "1:1" | Ignored when start_image_url provided. |
+| generate_audio | boolean | **yes for A-roll** | true | **Must be true** — A-roll needs synced dialogue audio. |
+| negative_prompt | string | no | free text | What to avoid |
+
+### Text-to-Video input schema (A-roll)
+
+| Field | Type | Required | Values | Notes |
+|-------|------|----------|--------|-------|
+| prompt | string | yes | free text | Scene + dialogue description |
+| duration | integer | no | 3-15 | Integer |
+| aspect_ratio | enum | no | "9:16", "16:9", "1:1" | Required for t2v |
+| generate_audio | boolean | **yes for A-roll** | true | **Must be true** |
+| negative_prompt | string | no | free text | |
+
+### Payload example (A-roll i2v)
+
+```json
+{
+  "prompt": "Camera: handheld iPhone-style front camera...\nDialogue: \"...and that is the part nobody talks about...\"\n...",
+  "start_image_url": "https://v3b.fal.media/files/.../coach-dan-frame.png",
+  "duration": 12,
+  "aspect_ratio": "9:16",
+  "generate_audio": true
+}
+```
+
+### Duration clamping
+
+Sora supports up to 20s. Kling max is 15s. If a script requests >15s, `generate-clip.sh` automatically clamps to 15s with a warning. For longer clips, use `extend-clip.sh` to chain multiple Kling generations.
+
+### Timing (from real testing)
+
+| Type | Duration | Generation time |
+|------|----------|----------------|
+| i2v Pro 5s | 5s | ~100s |
+| t2v Pro 5s | 5s | ~80s |
+
+Kling is **significantly faster** than Sora (~2 min vs ~5-10 min).
+
+### Response shape
+
+```json
+{
+  "video": {
+    "url": "https://...",
+    "content_type": "video/mp4",
+    "duration": 12.0
+  }
+}
+```
+
+---
+
 
 ## Replicate (FALLBACK)
 
@@ -204,14 +283,16 @@ Applies to Sora (both fal.ai and Replicate). Does NOT apply to Kling.
 
 The same concept has different field names per provider. This is the #1 source of silent failures.
 
+**Note:** fal.ai Kling is used for both B-roll and A-roll (as Sora fallback). For A-roll, always set `generate_audio: true`.
+
 | Concept | fal.ai Sora | fal.ai Kling | Replicate Sora | Replicate Kling Omni |
 |---------|------------|-------------|---------------|---------------------|
 | First frame image | `image_url` | `start_image_url` | `input_reference` | `start_image` |
 | Duration | `duration` (int enum: 4,8,12,16,20) | `duration` (int: 3-15) | `seconds` (int enum: 4,8,12) | `duration` (int: 3-15) |
-| Aspect ratio | `"9:16"` / `"16:9"` | `"9:16"` / `"16:9"` | `"portrait"` / `"landscape"` | `"9:16"` / `"16:9"` |
+| Aspect ratio | `"9:16"` / `"16:9"` | `"9:16"` / `"16:9"` / `"1:1"` | `"portrait"` / `"landscape"` | `"9:16"` / `"16:9"` |
 | Quality tier | `resolution`: "720p"/"1080p" | N/A (use pro endpoint) | `resolution`: "standard"/"high" | `mode`: "standard"/"pro" |
 | Character refs | `character_ids` (blocked) | N/A | N/A | `reference_images` + `<<<image_N>>>` |
-| Audio | always on (Sora) | `generate_audio` (default false) | always on (Sora) | `generate_audio` (default false) |
+| Audio | always on (Sora) | `generate_audio` (**true for A-roll**, false for B-roll) | always on (Sora) | `generate_audio` (**true for A-roll**) |
 
 ---
 
